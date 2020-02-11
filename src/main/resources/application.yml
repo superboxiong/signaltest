@@ -1,0 +1,16 @@
+#postgres参数配置
+spring:
+  datasource:
+#    url:
+    url: jdbc:postgresql://192.168.10.212/postdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+#端口路径配置
+server:
+  port: 9099
+  servlet:
+    context-path: /signaltest
+#swagger测试配置
+swagger:
+  enable: true #是否开启swagger

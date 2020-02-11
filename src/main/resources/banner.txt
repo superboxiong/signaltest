@@ -1,0 +1,14 @@
+${AnsiColor.BRIGHT_GREEN}
+     _             _ _
+    | |           | (_)
+  __| |_ _   _  __| |_  ___
+ |__| __| | | |/ _` | |/ __|
+    | |_| |_| | (_| | | (__
+     \__|\__, |\__,_|_|\___|
+          __/ |
+         |___/
+                                @Copyright 2010 深圳天源迪科信息技术股份有限公司 版权所有 粤ICP备08118076号
+${application.version}
+${application.formatted-version}
+${spring-boot.version}
+${spring-boot.formatted-version}
