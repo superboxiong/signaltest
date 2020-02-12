@@ -14,3 +14,8 @@ server:
 #swagger测试配置
 swagger:
   enable: true #是否开启swagger
+mybatis-plus:
+  type-aliases-package: com.tydic.signaltest.model
+  mapper-locations: classpath:mapper/**/*.xml
+  global-config:
+    sql-parser-cache: true

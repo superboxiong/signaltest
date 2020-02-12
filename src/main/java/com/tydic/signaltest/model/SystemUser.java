@@ -1,8 +1,13 @@
 package com.tydic.signaltest.model;
 
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Author superxiong
@@ -11,11 +16,13 @@ import java.io.Serializable;
  * 测试系统用户
  */
 @Data
+@TableName("system_user")
 public class SystemUser implements Serializable {
     private static final long serialVersionUID = 7981184993066601414L;
     /**
      * 用户id，及主键
      */
+    @TableId(type =IdType.AUTO)
     private Long id;
     /**
      * 用户名（手机号码）
@@ -28,7 +35,7 @@ public class SystemUser implements Serializable {
     /**
      * 注册时间
      */
-    private String registerTime;
+    private Date registerTime;
     /***
      * 用户头像
      */
@@ -40,6 +47,7 @@ public class SystemUser implements Serializable {
     /**
      * 验证码
      */
+    @TableField(exist = false)
     private String captcha;
 
     @Override
