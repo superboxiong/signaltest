@@ -21,5 +21,5 @@ public interface IUserRegister extends IService<SystemUser> {
      */
     void userForgetPwd(SystemUser user) throws Exception;
 
-    void test(String phone);
+
 }

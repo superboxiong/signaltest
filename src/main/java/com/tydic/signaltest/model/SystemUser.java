@@ -27,22 +27,27 @@ public class SystemUser implements Serializable {
     /**
      * 用户名（手机号码）
      */
+    @TableField(exist = true)
     private String userName;
     /**
      * 密码
      */
+    @TableField(exist = true)
     private String password;
     /**
      * 注册时间
      */
+    @TableField(exist = true)
     private Date registerTime;
     /***
      * 用户头像
      */
+    @TableField(exist = true)
     private String headImg;
     /**
      * 用户状态
      */
+    @TableField(exist = true)
     private boolean status;
     /**
      * 验证码

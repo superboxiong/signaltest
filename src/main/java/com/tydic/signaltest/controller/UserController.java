@@ -1,5 +1,6 @@
 package com.tydic.signaltest.controller;
 
+import com.tydic.signaltest.mapper.UserMapper;
 import com.tydic.signaltest.model.SystemUser;
 import com.tydic.signaltest.service.IUserRegister;
 import com.tydic.signaltest.service.impl.UserRegisterImpl;
@@ -78,9 +79,5 @@ public class UserController {
         return new ResponseResult<String>().getSuccess(null,"验证码发送成功");
      }
 
-     @PostMapping("/test")
-     @ApiOperation(value = "test",notes = "test")
-     public void test(@RequestBody Map<String,String> phone){
-             userRegister.test(phone.get("phone"));
-     }
+
 }
