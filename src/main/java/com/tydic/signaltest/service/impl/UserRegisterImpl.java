@@ -59,10 +59,6 @@ public class UserRegisterImpl extends ServiceImpl<UserMapper,SystemUser> impleme
         update(user,wrapper);
     }
 
-    @Override
-    public void test(String phone) {
-        redisTemplate.opsForValue().set(phone,"123456");
-    }
     /**
      * 将生成的验证码放入redis中
      */
