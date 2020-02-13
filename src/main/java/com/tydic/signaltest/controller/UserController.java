@@ -2,6 +2,7 @@ package com.tydic.signaltest.controller;
 
 import com.tydic.signaltest.model.SystemUser;
 import com.tydic.signaltest.service.IUserRegister;
+import com.tydic.signaltest.service.LoginService;
 import com.tydic.signaltest.utils.CommonUtils;
 import com.tydic.signaltest.utils.MessageInfo;
 import com.tydic.signaltest.utils.ResponseResult;
@@ -9,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,11 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version 1.0
  * 用户模块
  */
+
+
 @RestController
 @Api(tags = "用户模块")
 public class UserController {
+
     @Autowired(required = false)
     private IUserRegister userRegister;
+
+    @Autowired
+    private LoginService loginService;
+
     @PostMapping("/userRegister")
     @ApiOperation(value = "用户注册",notes = "用户根据手机号码注册")
     public ResponseResult<String> userRegister(SystemUser user) throws Exception {
@@ -34,6 +43,22 @@ public class UserController {
        }
        userRegister.userRegister(user);
        return new ResponseResult<String>().getSuccess(null, MessageInfo.REGISTER_SUCESSFUL);
+    }
+
+
+    public ResponseResult<String> userLogin(String phone, String password){
+
+        int code = loginService.getUser(phone, password);
+        if(code==0){
+            return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED_NULL);
+        }
+        if (code==1){
+            return new ResponseResult<String>().getSuccess(MessageInfo.LOGIN_SUCESSFUL);
+        }else {
+            return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED);
+        }
+
+
     }
 
 }

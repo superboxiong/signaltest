@@ -9,9 +9,11 @@ package com.tydic.signaltest.utils;
 public class  MessageInfo {
     public static final String LOGIN_SUCESSFUL="登录成功";
     public static final String LOGIN_FAILED="账号或密码错误";
+    public static final String LOGIN_FAILED_NULL="不存在当前用户";
     public static final String REGISTER_SUCESSFUL="注册成功";
     public static final String REGISTER_FAILED="注册失败";
     public static final String CHANGE_PASSWORD_SUCESSFUL="修改成功";
     public static final String CHANGE_PASSWORD_FAILED="修改成功";
+
 
 }
