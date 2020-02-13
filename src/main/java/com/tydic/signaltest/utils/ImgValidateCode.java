@@ -2,20 +2,17 @@ package com.tydic.signaltest.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author superxiong
@@ -23,13 +20,11 @@ import java.util.Random;
  * @Version 1.0
  * 图片验证码工具类
  */
-@Configuration
+@Component
 public class ImgValidateCode {
     private static final String PREFIX="signal-captcha:sms:";//redis中验证码key前缀
-    @Autowired
+    @Autowired(required = false)
     StringRedisTemplate redisTemplate;
-    @Autowired
-    StringRedisTemplate redisTemplate1;
     // 图片的宽度。
     private int width = 160;
     // 图片的高度。
@@ -157,23 +152,14 @@ public class ImgValidateCode {
         return code;
     }
     /**
-     * 测试函数,默认生成到d盘
-     * @param args
-     */
-//    public static void main(String[] args) {
-//
-//        redisTemplate1.opsForValue().set("13540426365","123456");
-//    }
-    /**
      * 将生成的验证码放入redis中
      */
     public  void addCodeToRedis(String code,String phoneNumber){
         String captchaCode=redisTemplate.opsForValue().get(PREFIX+phoneNumber);
         if(StringUtils.isNotBlank(captchaCode)){//存在验证码 将其删除
             redisTemplate.delete(PREFIX+phoneNumber);
-        }else{//不存在则存入redis中
-            redisTemplate.opsForValue().set(PREFIX+phoneNumber,code);
         }
+            redisTemplate.opsForValue().set(PREFIX+phoneNumber,code,1*60, TimeUnit.SECONDS);
 
     }
     /**
