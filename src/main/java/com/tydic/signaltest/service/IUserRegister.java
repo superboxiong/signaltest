@@ -13,5 +13,11 @@ public interface IUserRegister extends IService<SystemUser> {
      * 用户注册
      * @param user
      */
-    void userRegister(SystemUser user);
+    void userRegister(SystemUser user) throws Exception;
+
+    /**
+     * 用户重置密码
+     * @param user
+     */
+    void userForgetPwd(SystemUser user) throws Exception;
 }

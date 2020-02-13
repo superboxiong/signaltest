@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.tydic.signaltest.mapper.UserMapper;
 import com.tydic.signaltest.model.SystemUser;
 import com.tydic.signaltest.service.IUserRegister;
+import com.tydic.signaltest.utils.ImgValidateCode;
 import com.tydic.signaltest.utils.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +23,30 @@ public class UserRegisterImpl extends ServiceImpl<UserMapper,SystemUser> impleme
    @Autowired(required = false)
    private UserMapper userMapper;
     @Override
-    public void userRegister(SystemUser user) {
-         //使用MD5将密码加密
-        user.setId(4L);
+    public void userRegister(SystemUser user) throws Exception {
+        new ImgValidateCode().checkCode(user.getCaptcha(),user.getUserName());
+        Wrapper<SystemUser> wrapper=new EntityWrapper<>();
+        wrapper.eq("user_name",user.getUserName());
+        if(selectOne(wrapper)!=null){
+            throw new Exception("手机号已经存在");
+        }
+        //使用MD5将密码加密
         user.setPassword(MD5.getMD5ofStr(user.getPassword()));
         user.setRegisterTime(new Date());
         user.setStatus(true);
-        user.setHeadImg("qqqq");
-//        userMapper.insertIntoPg(user);
         insert(user);
-//        Wrapper<SystemUser> wrapper=new EntityWrapper<>();
 
+    }
+
+    @Override
+    public void userForgetPwd(SystemUser user) throws Exception {
+        Wrapper<SystemUser> wrapper=new EntityWrapper<>();
+        wrapper.eq("user_name",user.getUserName());
+        if(selectOne(wrapper)==null){
+            throw new Exception("账号不存在");
+        }
+//        new ImgValidateCode().checkCode(user.getCaptcha(),user.getUserName());
+        user.setPassword(MD5.getMD5ofStr(user.getPassword()));
+        update(user,wrapper);
     }
 }
