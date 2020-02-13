@@ -7,6 +7,9 @@ import com.tydic.signaltest.utils.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class LoginServiceImpl implements LoginService {
 
@@ -14,17 +17,23 @@ public class LoginServiceImpl implements LoginService {
     private UserMapper userMapper;
 
     @Override
-    public int getUser(String phone, String password) {
+    public Map<String,Object> getUser(String phone, String password) {
         SystemUser systemUser = userMapper.selectUserByPhone(phone);
+        Map map=new HashMap<String,Object>();
+        System.out.println(systemUser);
         if(systemUser==null){
-            return 0;
+            map.put("code",0);
+            return map;
         }
-        String passwordByDB = systemUser.getPassword();
+        String passwordByDB = systemUser.getPassword().trim();
         String md5ofPassword = MD5.getMD5ofStr(password);
-        if(systemUser.getUserName().equals(phone)&&passwordByDB.equals(md5ofPassword)){
-            return 1;
+        if(systemUser.getUserName().trim().equals(phone)&&passwordByDB.equals(md5ofPassword)){
+            map.put("code",1);
+            map.put("user",systemUser);
+            return map;
         }else {
-            return -1;
+            map.put("code",-1);
+            return map;
         }
     }
 }

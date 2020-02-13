@@ -1,7 +1,9 @@
 package com.tydic.signaltest.service;
 
 
+import java.util.Map;
+
 public interface LoginService {
 
-    int getUser(String phone,String password) ;
+    Map<String,Object> getUser(String phone, String password) ;
 }
