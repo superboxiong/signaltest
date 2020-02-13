@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Select;
 public interface UserMapper extends BaseMapper<SystemUser> {
     @Insert("insert into system_user(id,user_name,password,register_time,head_img,status) values(3,#{user.userName},#{user.password},#{user.registerTime},'aaaa',#{user.status})")
     void insertIntoPg(@Param("user") SystemUser user);
-    @Select("select * from system_user where user_name=#{phone}")
-    SystemUser selectByPhone(@Param("phone") String phone);
 
+    @Select("select * from system_user where user_name = #{phone}")
+    SystemUser selectUserByPhone(@Param("phone") String phone);
 }

@@ -3,6 +3,11 @@ package com.tydic.signaltest.controller;
 import com.tydic.signaltest.mapper.UserMapper;
 import com.tydic.signaltest.model.SystemUser;
 import com.tydic.signaltest.service.IUserRegister;
+import com.tydic.signaltest.service.LoginService;
+import com.tydic.signaltest.utils.CommonUtils;
+import com.tydic.signaltest.utils.ImgValidateCode;
+import com.tydic.signaltest.utils.MessageInfo;
+import com.tydic.signaltest.utils.ResponseResult;
 import com.tydic.signaltest.service.impl.UserRegisterImpl;
 import com.tydic.signaltest.utils.*;
 import io.swagger.annotations.Api;
@@ -10,6 +15,11 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
@@ -18,17 +28,25 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+
 /**
  * @Author superxiong
  * @Date 2020/2/11 16:49
  * @Version 1.0
  * 用户模块
  */
+
+
 @RestController
 @Api(tags = "用户模块")
 public class UserController {
+
     @Autowired(required = false)
-    private UserRegisterImpl userRegister;
+    private IUserRegister userRegister;
+
+    @Autowired
+    private LoginService loginService;
+
     @Autowired
     ImgValidateCode imgValidateCode;
     @PostMapping("/userRegister")
@@ -43,6 +61,27 @@ public class UserController {
        userRegister.userRegister(user);
        return new ResponseResult<String>().getSuccess(null, MessageInfo.REGISTER_SUCESSFUL);
     }
+
+
+
+    @GetMapping("/userLogin")
+    @ApiOperation(value = "用户登录",notes = "用户用手机号登录")
+    public ResponseResult<String> userLogin(String phone, String password){
+
+        Map<String, Object> result = loginService.getUser(phone, password);
+        if(Integer.parseInt(result.get("code").toString())==0){
+            return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED_NULL);
+        }
+        if (Integer.parseInt(result.get("code").toString())==1){
+            return new ResponseResult<String>().getSuccess(result.get("user").toString());
+        }else {
+            return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED);
+        }
+
+
+    }
+
+
     @PostMapping("/userForgetPwd")
     @ApiOperation(value = "密码重置",notes = "用户根据验证码修改密码")
     public ResponseResult<String> userForgetPwd(SystemUser user) throws Exception {
@@ -78,6 +117,7 @@ public class UserController {
         }
         return new ResponseResult<String>().getSuccess(null,"验证码发送成功");
      }
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.tydic.signaltest.utils;
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * @Author superxiong
@@ -43,29 +45,35 @@ public class ImgValidateCode {
             'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
             'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-    /**
+
+/**
      * 默认构造函数,设置默认参数
      */
+
     public ImgValidateCode() {
         this.createCode();
     }
 
-    /**
+
+/**
      * @param width  图片宽
      * @param height 图片高
      */
+
     public ImgValidateCode(int width, int height) {
         this.width = width;
         this.height = height;
         this.createCode();
     }
 
-    /**
+
+/**
      * @param width     图片宽
      * @param height    图片高
      * @param codeCount 字符个数
      * @param lineCount 干扰线条数
      */
+
     public ImgValidateCode(int width, int height, int codeCount, int lineCount) {
         this.width = width;
         this.height = height;
@@ -86,9 +94,11 @@ public class ImgValidateCode {
         buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = buffImg.createGraphics();
 
-        /*// 将图像背景填充为白色
+
+//将图像背景填充为白色
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, width, height);*/
+        g.fillRect(0, 0, width, height);
+
         // 增加下面代码使得背景透明
         buffImg = g.getDeviceConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
         g.dispose();
@@ -154,6 +164,7 @@ public class ImgValidateCode {
     /**
      * 将生成的验证码放入redis中
      */
+
     public  void addCodeToRedis(String code,String phoneNumber){
         String captchaCode=redisTemplate.opsForValue().get(PREFIX+phoneNumber);
         if(StringUtils.isNotBlank(captchaCode)){//存在验证码 将其删除
