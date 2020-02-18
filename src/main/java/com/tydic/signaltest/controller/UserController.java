@@ -38,6 +38,7 @@ import java.util.Map;
 
 
 @RestController
+@RequestMapping("/user")
 @Api(tags = "用户模块")
 public class UserController {
 
@@ -49,9 +50,9 @@ public class UserController {
 
     @Autowired
     ImgValidateCode imgValidateCode;
-    @PostMapping("/userRegister")
+    @PostMapping(value = "/userRegister",produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "用户注册",notes = "用户根据手机号码注册")
-    public ResponseResult<String> userRegister(SystemUser user) throws Exception {
+    public ResponseResult<String> userRegister(@RequestBody  SystemUser user) throws Exception {
        if(StringUtils.isBlank(user.getUserName()) || !CommonUtils.checkPhone(user.getUserName())){//手机号码不正确
            throw  new Exception("手机号码不正确");
        }
@@ -61,8 +62,6 @@ public class UserController {
        userRegister.userRegister(user);
        return new ResponseResult<String>().getSuccess(null, MessageInfo.REGISTER_SUCESSFUL);
     }
-
-
 
     @GetMapping("/userLogin")
     @ApiOperation(value = "用户登录",notes = "用户用手机号登录")
@@ -81,10 +80,9 @@ public class UserController {
 
     }
 
-
     @PostMapping("/userForgetPwd")
     @ApiOperation(value = "密码重置",notes = "用户根据验证码修改密码")
-    public ResponseResult<String> userForgetPwd(SystemUser user) throws Exception {
+    public ResponseResult<String> userForgetPwd(@RequestBody  SystemUser user) throws Exception {
         if(StringUtils.isBlank(user.getUserName()) || !CommonUtils.checkPhone(user.getUserName())){//手机号码不正确
             throw  new Exception("手机号码不正确");
         }
@@ -96,16 +94,19 @@ public class UserController {
     }
      @GetMapping("/sendImgCode")
      @ApiOperation(value = "图片验证码",notes = "用户使用手机号码获取图片验证码")
-     public void sendImgCode(HttpServletRequest request, HttpServletResponse response,@RequestParam Map<String,String> phoneNumber) throws Exception {
-        if(StringUtils.isBlank(phoneNumber.get("phoneNumber")) || CommonUtils.checkPhone(phoneNumber.get("phoneNumber"))){
+     public void sendImgCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String tempPhoneNumber=request.getParameter("phoneNumber"); //图片get请求 获取地址后面的参数
+         String phoneNumber=tempPhoneNumber.substring(0,tempPhoneNumber.indexOf("?"));
+        if(StringUtils.isBlank(phoneNumber) || !CommonUtils.checkPhone(phoneNumber)){
             throw new Exception("手机号码错误");
         }
+//         ,@RequestBody Map<String,String> phoneNumber
          // 通知浏览器不要缓存
          response.setHeader("Expires", "-1");
          response.setHeader("Cache-Control", "no-cache");
          response.setHeader("Pragma", "-1");
          ImgValidateCode vCode = new ImgValidateCode(160,40,5,150);
-         imgValidateCode.addCodeToRedis(vCode.getCode(),phoneNumber.get("phoneNumber"));
+         imgValidateCode.addCodeToRedis(vCode.getCode(),phoneNumber);
          // 输出到web页面
          ImageIO.write(vCode.getBuffImg(), "jpg", response.getOutputStream());
      }
@@ -117,7 +118,4 @@ public class UserController {
         }
         return new ResponseResult<String>().getSuccess(null,"验证码发送成功");
      }
-
-
-
 }
