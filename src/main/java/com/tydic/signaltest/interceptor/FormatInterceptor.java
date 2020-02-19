@@ -14,18 +14,23 @@ import javax.servlet.http.HttpServletResponse;
  * @Version:        1.0
  * @Description:    拦截请求，判断登录的phone和password是否符合格式
  */
-public class CustomInterceptor implements HandlerInterceptor {
+public class FormatInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         ModelAndView modelAndView=new ModelAndView();
         String phone = request.getParameter("phone");
         String password = request.getParameter("password");
-        if(StringUtils.isBlank(phone)|| CommonUtils.checkPhone(phone)){
-            modelAndView.addObject("msg","手机号有空格或不正确");
+
+        if(StringUtils.isBlank(phone)|| !CommonUtils.checkPhone(phone)){
+            //modelAndView.addObject("msg","手机号有空格或不正确");
+            System.out.println("手机号有空格或不正确,手机号："+phone+",密码："+password);
+            response.getWriter().write("手机号有空格或不正确");
             return false;
         }
-        if(StringUtils.isBlank(password)||CommonUtils.checkPassword(password)){
-            modelAndView.addObject("msg","密码有空格或格式不正确");
+        if(StringUtils.isBlank(password)||!CommonUtils.checkPassword(password)){
+            //modelAndView.addObject("msg","密码有空格或格式不正确");
+            System.out.println("密码有空格或格式不正确");
+            response.getWriter().write("密码有空格或格式不正确");
             return false;
         }
 
