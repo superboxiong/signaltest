@@ -20,4 +20,6 @@ public interface IUserRegister extends IService<SystemUser> {
      * @param user
      */
     void userForgetPwd(SystemUser user) throws Exception;
+
+
 }

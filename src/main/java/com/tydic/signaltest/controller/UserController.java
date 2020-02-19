@@ -1,13 +1,20 @@
 package com.tydic.signaltest.controller;
 
+import com.tydic.signaltest.mapper.UserMapper;
 import com.tydic.signaltest.model.SystemUser;
 import com.tydic.signaltest.service.IUserRegister;
 import com.tydic.signaltest.service.LoginService;
+import com.tydic.signaltest.utils.CommonUtils;
+import com.tydic.signaltest.utils.ImgValidateCode;
+import com.tydic.signaltest.utils.MessageInfo;
+import com.tydic.signaltest.utils.ResponseResult;
+import com.tydic.signaltest.service.impl.UserRegisterImpl;
 import com.tydic.signaltest.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +42,7 @@ import java.util.UUID;
 
 
 @RestController
+@RequestMapping("/user")
 @Api(tags = "用户模块")
 public class UserController {
 
@@ -44,9 +52,11 @@ public class UserController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("/userRegister")
+    @Autowired
+    ImgValidateCode imgValidateCode;
+    @PostMapping(value = "/userRegister",produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "用户注册",notes = "用户根据手机号码注册")
-    public ResponseResult<String> userRegister(SystemUser user) throws Exception {
+    public ResponseResult<String> userRegister(@RequestBody  SystemUser user) throws Exception {
        if(StringUtils.isBlank(user.getUserName()) || !CommonUtils.checkPhone(user.getUserName())){//手机号码不正确
            throw  new Exception("手机号码不正确");
        }
@@ -66,8 +76,8 @@ public class UserController {
      */
     @GetMapping("/userLogin")
     @ApiOperation(value = "用户登录",notes = "用户用手机号登录")
-    public ResponseResult<String> userLogin(String phone, String password,boolean flag,
-                                            HttpServletRequest request, HttpServletResponse response){
+    public ResponseResult<String> userLogin(String phone, String password){
+
         Map<String, Object> result = loginService.getUser(phone, password);
         if(Integer.parseInt(result.get("code").toString())==0){
             return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED_NULL);
@@ -106,10 +116,9 @@ public class UserController {
 
     }
 
-
     @PostMapping("/userForgetPwd")
     @ApiOperation(value = "密码重置",notes = "用户根据验证码修改密码")
-    public ResponseResult<String> userForgetPwd(SystemUser user) throws Exception {
+    public ResponseResult<String> userForgetPwd(@RequestBody  SystemUser user) throws Exception {
         if(StringUtils.isBlank(user.getUserName()) || !CommonUtils.checkPhone(user.getUserName())){//手机号码不正确
             throw  new Exception("手机号码不正确");
         }
@@ -121,18 +130,21 @@ public class UserController {
     }
      @GetMapping("/sendImgCode")
      @ApiOperation(value = "图片验证码",notes = "用户使用手机号码获取图片验证码")
-     public void sendImgCode(HttpServletRequest request, HttpServletResponse response,@RequestParam Map<String,String> phoneNumber) throws IOException {
+     public void sendImgCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String tempPhoneNumber=request.getParameter("phoneNumber"); //图片get请求 获取地址后面的参数
+         String phoneNumber=tempPhoneNumber.substring(0,tempPhoneNumber.indexOf("?"));
+        if(StringUtils.isBlank(phoneNumber) || !CommonUtils.checkPhone(phoneNumber)){
+            throw new Exception("手机号码错误");
+        }
+//         ,@RequestBody Map<String,String> phoneNumber
          // 通知浏览器不要缓存
          response.setHeader("Expires", "-1");
          response.setHeader("Cache-Control", "no-cache");
          response.setHeader("Pragma", "-1");
          ImgValidateCode vCode = new ImgValidateCode(160,40,5,150);
-         // 将验证码输入到redis中，用来验证
-         vCode.addCodeToRedis(vCode.getCode(),phoneNumber.get("phoneNumber"));
-//         request.getSession().setAttribute("code", code);
+         imgValidateCode.addCodeToRedis(vCode.getCode(),phoneNumber);
          // 输出到web页面
          ImageIO.write(vCode.getBuffImg(), "jpg", response.getOutputStream());
-//         return new ResponseResult<>().getSuccess("获取图片验证码成功");
      }
      @PostMapping("/sendSms")
      @ApiOperation(value = "短信接口",notes = "用户注册短信验证码接口")
@@ -142,5 +154,4 @@ public class UserController {
         }
         return new ResponseResult<String>().getSuccess(null,"验证码发送成功");
      }
-
 }

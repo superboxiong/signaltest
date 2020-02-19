@@ -3,12 +3,9 @@ package com.tydic.signaltest.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -25,22 +23,19 @@ import java.util.Random;
  * @Version 1.0
  * 图片验证码工具类
  */
-
-@Configuration
+@Component
 public class ImgValidateCode {
     private static final String PREFIX="signal-captcha:sms:";//redis中验证码key前缀
-    @Autowired
+    @Autowired(required = false)
     StringRedisTemplate redisTemplate;
-    @Autowired
-    StringRedisTemplate redisTemplate1;
     // 图片的宽度。
     private int width = 160;
     // 图片的高度。
     private int height = 40;
     // 验证码字符个数
-    private int codeCount = 5;
+    private int codeCount = 4;
     // 验证码干扰线数
-    private int lineCount = 150;
+    private int lineCount = 100;
     // 验证码
     private String code = null;
     // 验证码图片Buffer
@@ -49,7 +44,7 @@ public class ImgValidateCode {
     // 验证码范围,去掉0(数字)和O(拼音)容易混淆的(小写的1和L也可以去掉,大写不用了)
     private char[] codeSequence = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-            'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            'X', 'Y', 'Z','0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 
 /**
@@ -139,6 +134,7 @@ public class ImgValidateCode {
         // 随机产生codeCount个字符的验证码。
         for (int i = 0; i < codeCount; i++) {
             String strRand = String.valueOf(codeSequence[random.nextInt(codeSequence.length)]);
+//            String strRand = String.valueOf(str[i]);
             // 产生随机的颜色值，让输出的每个字符的颜色值都将不同。
             red = random.nextInt(255);
             green = random.nextInt(255);
@@ -167,18 +163,7 @@ public class ImgValidateCode {
     public String getCode() {
         return code;
     }
-
-/**
-     * 测试函数,默认生成到d盘
-     * @param args
-     */
-
-//    public static void main(String[] args) {
-//
-//        redisTemplate1.opsForValue().set("13540426365","123456");
-//    }
-
-/**
+    /**
      * 将生成的验证码放入redis中
      */
 
@@ -186,16 +171,13 @@ public class ImgValidateCode {
         String captchaCode=redisTemplate.opsForValue().get(PREFIX+phoneNumber);
         if(StringUtils.isNotBlank(captchaCode)){//存在验证码 将其删除
             redisTemplate.delete(PREFIX+phoneNumber);
-        }else{//不存在则存入redis中
-            redisTemplate.opsForValue().set(PREFIX+phoneNumber,code);
         }
+            redisTemplate.opsForValue().set(PREFIX+phoneNumber,code,1*60, TimeUnit.SECONDS);
 
     }
-
-/**
+    /**
      * 校验验证码
      */
-
     public  void checkCode(String code,String phoneNumber) throws Exception {
        String tempCode=redisTemplate.opsForValue().get(PREFIX+phoneNumber);//在redis中获取验证码
         if(StringUtils.isBlank(tempCode)){//redis中不存在验证码
@@ -208,5 +190,15 @@ public class ImgValidateCode {
             redisTemplate.delete(tempCode);
         }
     }
-}
+public static void main(String[] args) {
+    ImgValidateCode vCode = new ImgValidateCode(160,40,5,150);
+    try {
+        String path="D:/"+new Date().getTime()+".png";
+        System.out.println(vCode.getCode()+" >"+path);
+        vCode.write(path);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+ }
 
+}
