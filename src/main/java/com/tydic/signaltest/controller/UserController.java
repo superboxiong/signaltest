@@ -76,8 +76,8 @@ public class UserController {
      */
     @GetMapping("/userLogin")
     @ApiOperation(value = "用户登录",notes = "用户用手机号登录")
-    public ResponseResult<String> userLogin(String phone, String password){
-
+    public ResponseResult<String> userLogin(String phone,String password,boolean flag,
+                                            HttpServletResponse response){
         Map<String, Object> result = loginService.getUser(phone, password);
         if(Integer.parseInt(result.get("code").toString())==0){
             return new ResponseResult<String>().getFailure(MessageInfo.LOGIN_FAILED_NULL);
@@ -86,7 +86,6 @@ public class UserController {
 
             if(flag==true){
                 //判断用户是否记住密码
-
                     long createTime = System.currentTimeMillis()/1000;
                     String s = UUID.randomUUID().toString();
                     String md5ofAgent=MD5.getMD5ofStr(s);
@@ -97,7 +96,7 @@ public class UserController {
 
                     Cookie cookie=new Cookie(phone,Phone_md5ofAgent);
                     cookie.setMaxAge(60*60*24*7);
-                    cookie.setPath("/signaltest/userLogin");
+                    cookie.setPath("/signaltest/user/userLogin");
                     response.addCookie(cookie);
 
                     //将phone和md5ofAgent返回到前端保存，记住密码登陆时取出来

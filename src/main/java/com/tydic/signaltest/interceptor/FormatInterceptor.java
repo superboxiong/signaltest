@@ -23,15 +23,15 @@ public class FormatInterceptor implements HandlerInterceptor {
 
         if(StringUtils.isBlank(phone)|| !CommonUtils.checkPhone(phone)){
             //modelAndView.addObject("msg","手机号有空格或不正确");
+
             System.out.println("手机号有空格或不正确,手机号："+phone+",密码："+password);
-            response.getWriter().write("手机号有空格或不正确");
-            return false;
+            throw new Exception("手机号有空格或不正确");
         }
         if(StringUtils.isBlank(password)||!CommonUtils.checkPassword(password)){
             //modelAndView.addObject("msg","密码有空格或格式不正确");
             System.out.println("密码有空格或格式不正确");
-            response.getWriter().write("密码有空格或格式不正确");
-            return false;
+            throw new Exception("密码有空格或格式不正确");
+
         }
 
         return true;
